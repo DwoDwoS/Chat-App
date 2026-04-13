@@ -1,0 +1,20 @@
+<div class="chat">
+  <ul class="messages">
+    @for (msg of messages(); track $index) {
+      <li>{{ msg }}</li>
+    } @empty {
+      <li class="empty">Aucun message pour l'instant.</li>
+    }
+  </ul>
+
+  <form class="composer" (submit)="send(); $event.preventDefault()">
+    <input
+      type="text"
+      [(ngModel)]="draft"
+      name="draft"
+      placeholder="Écris un message..."
+      autocomplete="off"
+    />
+    <button type="submit">Envoyer</button>
+  </form>
+</div>
