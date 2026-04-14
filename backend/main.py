@@ -3,6 +3,8 @@ import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from database import SessionLocal, Message
+
 app = FastAPI()
 
 app.add_middleware(
@@ -12,30 +14,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Stockage en mémoire (temporaire — on ajoutera SQLite plus tard)
-messages: list[dict] = []
-
-# Liste des clients WebSocket connectés
 connected_clients: list[WebSocket] = []
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     connected_clients.append(websocket)
 
-    # Envoyer l'historique au nouveau client
-    for msg in messages:
-        await websocket.send_text(json.dumps(msg))
+    db = SessionLocal()
+    history = db.query(Message).order_by(Message.id).all()
+    for msg in history:
+        await websocket.send_text(json.dumps({
+            "username": msg.username,
+            "text": msg.text,
+        }))
+    db.close()
 
     try:
         while True:
             data = await websocket.receive_text()
-            message = json.loads(data)
-            messages.append(message)
+            parsed = json.loads(data)
 
-            # Diffuser à tous les clients connectés
+            db = SessionLocal()
+            db_message = Message(username=parsed["username"], text=parsed["text"])
+            db.add(db_message)
+            db.commit()
+            db.close()
+
             for client in connected_clients:
-                await client.send_text(json.dumps(message))
+                await client.send_text(data)
     except WebSocketDisconnect:
         connected_clients.remove(websocket)
