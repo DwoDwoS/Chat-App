@@ -1,0 +1,38 @@
+@if (!joined) {
+  <div class="join">
+    <h2>Rejoindre le chat</h2>
+    <form (submit)="join(); $event.preventDefault()">
+      <input
+        type="text"
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Ton pseudo..."
+        autocomplete="off"
+      />
+      <button type="submit">Entrer</button>
+    </form>
+  </div>
+} @else {
+  <div class="chat">
+    <ul class="messages">
+      @for (msg of messages(); track $index) {
+        <li [class.mine]="msg.username === username">
+          <strong>{{ msg.username }}</strong> {{ msg.text }}
+        </li>
+      } @empty {
+        <li class="empty">Aucun message pour l'instant.</li>
+      }
+    </ul>
+
+    <form class="composer" (submit)="send(); $event.preventDefault()">
+      <input
+        type="text"
+        [(ngModel)]="draft"
+        name="draft"
+        placeholder="Écris un message..."
+        autocomplete="off"
+      />
+      <button type="submit">Envoyer</button>
+    </form>
+  </div>
+}
