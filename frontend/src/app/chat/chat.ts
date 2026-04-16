@@ -15,6 +15,9 @@ export class Chat implements OnInit, OnDestroy {
   draft = '';
   username = '';
   joined = false;
+  aiQuestion = '';
+  aiPanelOpen = false;
+  aiLoading = false;
   private subscription!: Subscription;
 
   constructor(private chatService: ChatService) {}
@@ -41,5 +44,33 @@ export class Chat implements OnInit, OnDestroy {
     if (!text) return;
     this.chatService.send(this.username, text);
     this.draft = '';
+  }
+
+  toggleAiPanel() {
+    this.aiPanelOpen = !this.aiPanelOpen;
+  }
+
+  askAi() {
+    const question = this.aiQuestion.trim();
+    if (!question || this.aiLoading) return;
+    this.aiLoading = true;
+    this.chatService.askAi(question).subscribe({
+      next: (res) => {
+        this.messages.update((list) => [
+          ...list,
+          { username: 'SQLock IA', text: res.answer, created_at: new Date().toISOString() },
+        ]);
+        this.aiQuestion = '';
+        this.aiLoading = false;
+        this.aiPanelOpen = false;
+      },
+      error: () => {
+        this.messages.update((list) => [
+          ...list,
+          { username: 'SQLock IA', text: "Désolé, je n'ai pas pu répondre. Réessaie plus tard.", created_at: new Date().toISOString() },
+        ]);
+        this.aiLoading = false;
+      },
+    });
   }
 }

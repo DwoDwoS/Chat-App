@@ -112,3 +112,53 @@
 .composer button:hover {
   background: #1d4ed8;
 }
+
+.ai-toggle {
+  background: #7c3aed !important;
+  font-size: 1.1rem;
+  padding: 0.5rem 0.6rem !important;
+}
+
+.ai-toggle:hover {
+  background: #6d28d9 !important;
+}
+
+.ai-panel {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.ai-panel input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #7c3aed;
+  border-radius: 4px;
+}
+
+.ai-panel button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #7c3aed;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ai-panel button:hover {
+  background: #6d28d9;
+}
+
+.ai-panel button:disabled {
+  background: #a78bfa;
+  cursor: wait;
+}
+
+.messages li.ai {
+  background: #f5f3ff;
+  border-color: #c4b5fd;
+}
+
+.messages li.ai strong {
+  color: #7c3aed;
+}

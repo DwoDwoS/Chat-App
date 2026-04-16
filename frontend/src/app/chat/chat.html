@@ -16,7 +16,7 @@
   <div class="chat">
     <ul class="messages">
       @for (msg of messages(); track $index) {
-        <li [class.mine]="msg.username === username">
+        <li [class.mine]="msg.username === username" [class.ai]="msg.username === 'SQLock IA'">
           <div class="msg-header">
             <strong>{{ msg.username }}</strong>
             @if (msg.created_at) {
@@ -39,6 +39,24 @@
         autocomplete="off"
       />
       <button type="submit">Envoyer</button>
+      <button type="button" class="ai-toggle" (click)="toggleAiPanel()" title="Demander à l'IA">
+        🤖
+      </button>
     </form>
+
+    @if (aiPanelOpen) {
+      <form class="ai-panel" (submit)="askAi(); $event.preventDefault()">
+        <input
+          type="text"
+          [(ngModel)]="aiQuestion"
+          name="aiQuestion"
+          placeholder="Pose ta question à SQLock IA..."
+          autocomplete="off"
+        />
+        <button type="submit" [disabled]="aiLoading">
+          @if (aiLoading) { Réflexion... } @else { Demander }
+        </button>
+      </form>
+    }
   </div>
 }

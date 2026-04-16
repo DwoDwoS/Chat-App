@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
@@ -11,7 +12,10 @@ export interface ChatMessage {
   providedIn: 'root',
 })
 export class ChatService {
+  private apiUrl = 'http://localhost:8000';
   private socket!: WebSocket;
+
+  constructor(private http: HttpClient) {}
   private messagesSubject = new Subject<ChatMessage>();
 
   messages$: Observable<ChatMessage> = this.messagesSubject.asObservable();
@@ -32,6 +36,10 @@ export class ChatService {
   send(username: string, text: string) {
     const message: ChatMessage = { username, text };
     this.socket.send(JSON.stringify(message));
+  }
+
+  askAi(question: string): Observable<{ answer: string }> {
+    return this.http.post<{ answer: string }>(`${this.apiUrl}/api/ai`, { question });
   }
 
   disconnect() {
