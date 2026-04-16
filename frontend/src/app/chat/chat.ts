@@ -1,11 +1,12 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatService, ChatMessage } from './chat.service';
 
 @Component({
   selector: 'app-chat',
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './chat.html',
   styleUrl: './chat.css',
 })
