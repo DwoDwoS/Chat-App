@@ -60,9 +60,20 @@
   border: 1px solid #eee;
 }
 
+.messages li .msg-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.15rem;
+}
+
 .messages li strong {
   color: #2563eb;
-  margin-right: 0.3rem;
+}
+
+.messages li .timestamp {
+  font-size: 0.65rem;
+  color: #aaa;
 }
 
 .messages li.mine {
