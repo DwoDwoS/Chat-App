@@ -17,7 +17,13 @@
     <ul class="messages">
       @for (msg of messages(); track $index) {
         <li [class.mine]="msg.username === username">
-          <strong>{{ msg.username }}</strong> {{ msg.text }}
+          <div class="msg-header">
+            <strong>{{ msg.username }}</strong>
+            @if (msg.created_at) {
+              <span class="timestamp">{{ msg.created_at | date:'dd/MM/yy HH:mm' }}</span>
+            }
+          </div>
+          <span>{{ msg.text }}</span>
         </li>
       } @empty {
         <li class="empty">Aucun message pour l'instant.</li>

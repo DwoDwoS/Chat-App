@@ -27,6 +27,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.send_text(json.dumps({
             "username": msg.username,
             "text": msg.text,
+            "created_at": msg.created_at.isoformat(),
         }))
     db.close()
 
@@ -39,9 +40,16 @@ async def websocket_endpoint(websocket: WebSocket):
             db_message = Message(username=parsed["username"], text=parsed["text"])
             db.add(db_message)
             db.commit()
+            db.refresh(db_message)
+
+            broadcast = json.dumps({
+                "username": db_message.username,
+                "text": db_message.text,
+                "created_at": db_message.created_at.isoformat(),
+            })
             db.close()
 
             for client in connected_clients:
-                await client.send_text(data)
+                await client.send_text(broadcast)
     except WebSocketDisconnect:
         connected_clients.remove(websocket)

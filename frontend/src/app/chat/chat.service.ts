@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 export interface ChatMessage {
   username: string;
   text: string;
+  created_at?: string;
 }
 
 @Injectable({
