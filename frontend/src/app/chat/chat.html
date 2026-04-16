@@ -14,38 +14,68 @@
   </div>
 } @else {
   <div class="chat">
-    <ul class="messages">
-      @for (msg of messages(); track $index) {
-        <li [class.mine]="msg.username === username" [class.ai]="msg.username === 'SQLock IA'">
-          <div class="msg-header">
-            <strong>{{ msg.username }}</strong>
-            @if (msg.created_at) {
-              <span class="timestamp">{{ msg.created_at | date:'dd/MM/yy HH:mm' }}</span>
-            }
-          </div>
-          <span>{{ msg.text }}</span>
-        </li>
-      } @empty {
-        <li class="empty">Aucun message pour l'instant.</li>
-      }
-    </ul>
-
-    <form class="composer" (submit)="send(); $event.preventDefault()">
-      <input
-        type="text"
-        [(ngModel)]="draft"
-        name="draft"
-        placeholder="Écris un message..."
-        autocomplete="off"
-      />
-      <button type="submit">Envoyer</button>
-      <button type="button" class="ai-toggle" (click)="toggleAiPanel()" title="Demander à l'IA">
-        🤖
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'chat'"
+        (click)="activeTab = 'chat'"
+      >
+        Chat
       </button>
-    </form>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'ai'"
+        (click)="activeTab = 'ai'"
+      >
+        SQLock IA
+      </button>
+    </div>
 
-    @if (aiPanelOpen) {
-      <form class="ai-panel" (submit)="askAi(); $event.preventDefault()">
+    @if (activeTab === 'chat') {
+      <ul class="messages">
+        @for (msg of messages(); track $index) {
+          <li [class.mine]="msg.username === username">
+            <div class="msg-header">
+              <strong>{{ msg.username }}</strong>
+              @if (msg.created_at) {
+                <span class="timestamp">{{ msg.created_at | date:'dd/MM/yy HH:mm' }}</span>
+              }
+            </div>
+            <span>{{ msg.text }}</span>
+          </li>
+        } @empty {
+          <li class="empty">Aucun message pour l'instant.</li>
+        }
+      </ul>
+
+      <form class="composer" (submit)="send(); $event.preventDefault()">
+        <input
+          type="text"
+          [(ngModel)]="draft"
+          name="draft"
+          placeholder="Écris un message..."
+          autocomplete="off"
+        />
+        <button type="submit">Envoyer</button>
+      </form>
+    }
+
+    @if (activeTab === 'ai') {
+      <ul class="messages ai-messages">
+        @for (msg of aiMessages(); track $index) {
+          <li [class.user]="msg.role === 'user'" [class.ai]="msg.role === 'assistant'">
+            <div class="msg-header">
+              <strong>{{ msg.role === 'user' ? username : 'SQLock IA' }}</strong>
+              <span class="timestamp">{{ msg.created_at | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+            <span>{{ msg.text }}</span>
+          </li>
+        } @empty {
+          <li class="empty">Pose une question pour obtenir de l'aide sur ton enquête SQL.</li>
+        }
+      </ul>
+
+      <form class="composer ai-composer" (submit)="askAi(); $event.preventDefault()">
         <input
           type="text"
           [(ngModel)]="aiQuestion"

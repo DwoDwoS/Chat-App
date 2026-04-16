@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatService, ChatMessage } from './chat.service';
 
+export interface AiMessage {
+  role: 'user' | 'assistant';
+  text: string;
+  created_at: string;
+}
+
 @Component({
   selector: 'app-chat',
   imports: [FormsModule, DatePipe],
@@ -12,11 +18,12 @@ import { ChatService, ChatMessage } from './chat.service';
 })
 export class Chat implements OnInit, OnDestroy {
   messages = signal<ChatMessage[]>([]);
+  aiMessages = signal<AiMessage[]>([]);
   draft = '';
   username = '';
   joined = false;
+  activeTab: 'chat' | 'ai' = 'chat';
   aiQuestion = '';
-  aiPanelOpen = false;
   aiLoading = false;
   private subscription!: Subscription;
 
@@ -46,28 +53,29 @@ export class Chat implements OnInit, OnDestroy {
     this.draft = '';
   }
 
-  toggleAiPanel() {
-    this.aiPanelOpen = !this.aiPanelOpen;
-  }
-
   askAi() {
     const question = this.aiQuestion.trim();
     if (!question || this.aiLoading) return;
+
+    this.aiMessages.update((list) => [
+      ...list,
+      { role: 'user', text: question, created_at: new Date().toISOString() },
+    ]);
+    this.aiQuestion = '';
     this.aiLoading = true;
+
     this.chatService.askAi(question).subscribe({
       next: (res) => {
-        this.messages.update((list) => [
+        this.aiMessages.update((list) => [
           ...list,
-          { username: 'SQLock IA', text: res.answer, created_at: new Date().toISOString() },
+          { role: 'assistant', text: res.answer, created_at: new Date().toISOString() },
         ]);
-        this.aiQuestion = '';
         this.aiLoading = false;
-        this.aiPanelOpen = false;
       },
       error: () => {
-        this.messages.update((list) => [
+        this.aiMessages.update((list) => [
           ...list,
-          { username: 'SQLock IA', text: "Désolé, je n'ai pas pu répondre. Réessaie plus tard.", created_at: new Date().toISOString() },
+          { role: 'assistant', text: "Désolé, je n'ai pas pu répondre. Réessaie plus tard.", created_at: new Date().toISOString() },
         ]);
         this.aiLoading = false;
       },
